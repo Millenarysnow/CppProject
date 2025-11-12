@@ -427,5 +427,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# 保留 Documents 文件夹及所有子目录
 !/Documents/
 !/Documents/**

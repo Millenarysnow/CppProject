@@ -430,3 +430,6 @@ FodyWeavers.xsd
 # 保留 Documents 文件夹及所有子目录
 !/Documents/
 !/Documents/**
+
+# 删除 rider 临时文件夹
+.idea/

@@ -3,10 +3,22 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
+#include <unordered_map>
+#include "sparse_sets.h"
 
 #define assertm(msg, expr) assert(((void)msg, expr))
 
 namespace ecs {
+
+    using ComponentID = uint32_t;
+    using Entity = uint32_t;
+
+    class IndexGetter final
+    {
+
+    };
+
+
     class World final
     {
     public:
@@ -56,5 +68,26 @@ namespace ecs {
                 }
             }
         };
+
+        struct ComponentInfo
+        {
+            Pool pool;
+            SparseSets<Entity, 32> sparseSet;
+
+            void AddEntity(Entity entity)
+            {
+				sparseSet.Add(entity);
+            }
+
+            void RemoveEntity(Entity entity)
+            {
+				sparseSet.Remove(entity);
+            }
+        };
+
+        using ComponentPool = std::unordered_map<ComponentID, ComponentInfo>;
+		ComponentPool componentMap_;
+
+
     };  
 }

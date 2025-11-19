@@ -15,7 +15,15 @@ namespace ecs {
 
     class IndexGetter final
     {
-
+    public:
+		template<typename T>
+        ComponentID Get()
+        {
+            static ComponentID id = curIdx_ ++;
+            return id;
+        }
+    private:
+        inline static ComponentID curIdx_ = 0;
     };
 
 

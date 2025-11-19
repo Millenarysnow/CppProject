@@ -7,9 +7,9 @@
 #include <cassert>
 
 /**
-* std::is_integral_v<T> ±àÒëÆÚÅĞ¶ÏTÊÇ·ñÎªÕûĞÍ£¬·ñÔò·µ»Øfalse
-* std::enable_if<Ìõ¼ş£¬ÀàĞÍ> ÈôÌõ¼şÎªÕæÔò·µ»ØÀàĞÍ£¨Ê¡ÂÔÎªvoid£©£¬Îª¼ÙÔòÌæ»»Ê§°Ü£¬¶ø²»·µ»ØÈÎºÎÀàĞÍ
-* typename = ÊÇÒ»¸öÄäÃû²ÎÊı£¬½öÓÃÓÚÀàĞÍ¼ì²é
+* std::is_integral_v<T> ç¼–è¯‘æœŸåˆ¤æ–­Tæ˜¯å¦ä¸ºæ•´å‹ï¼Œå¦åˆ™è¿”å›false
+* std::enable_if<æ¡ä»¶ï¼Œç±»å‹> è‹¥æ¡ä»¶ä¸ºçœŸåˆ™è¿”å›ç±»å‹ï¼ˆçœç•¥ä¸ºvoidï¼‰ï¼Œä¸ºå‡åˆ™æ›¿æ¢å¤±è´¥ï¼Œè€Œä¸è¿”å›ä»»ä½•ç±»å‹
+* typename = æ˜¯ä¸€ä¸ªåŒ¿åå‚æ•°ï¼Œä»…ç”¨äºç±»å‹æ£€æŸ¥
 */
 template<typename T, size_t PageSize, typename = std::enable_if<std::is_integral_v<T>>>
 class SparseSets final
@@ -64,7 +64,7 @@ public:
 private:
 	std::vector<T> density_;
 	/**
-	* ÕâÀïµÄ unique_ptr ±£Ö¤ÁËÔÚÊ¹ÓÃÊ±²Å»á¸ø¶ÔÓ¦µÄ array ·ÖÅäÄÚ´æ
+	* è¿™é‡Œçš„ unique_ptr ä¿è¯äº†åœ¨ä½¿ç”¨æ—¶æ‰ä¼šç»™å¯¹åº”çš„ array åˆ†é…å†…å­˜
 	*/
 	std::vector<std::unique_ptr<std::array<T, PageSize>>> sparse_;
 	static constexpr T null = std::numeric_limits<T>::max();

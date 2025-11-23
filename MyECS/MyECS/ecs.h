@@ -5,6 +5,8 @@
 #include <cassert>
 #include <unordered_map>
 
+#include "sparse_sets.h"
+
 #define assertm(msg, expr) assert(((void)msg, expr))
 
 namespace ecs {
@@ -12,6 +14,9 @@ namespace ecs {
     using ComponentID = uint32_t;
     using Entity = uint32_t;
 
+    /**
+	* 给定任意的类型，返回一个该类型唯一的ID
+    */
     class IndexGetter final
     {
     public:
@@ -27,10 +32,14 @@ namespace ecs {
          */
         inline static ComponentID curIdx_ = 0;    
     };
+
+    class Commands;
     
     class World final
     {
     public:
+        friend class Commands;
+		using ComponentContainter = std::unordered_map<ComponentID, void*>; // 存储组件ID对应的组件 
     private:
         /**
          * 用于 Component 的内存池
@@ -80,9 +89,33 @@ namespace ecs {
             }
         };
 
+        /**
+		* 存储某个 Component 类型的所有实体信息
+         */
+        struct ComponentInfo
+        {
+            Pool pool;
+            SparseSets<Entity, 32> sparseSet;
+
+            void AddEntity(Entity entity)
+            {
+				sparseSet.Add(entity);
+            }
+
+            void RemoveEntity(Entity entity)
+            {
+				sparseSet.Remove(entity);
+            }
+        };
         
-        
-        using ComponentPool = std::unordered_map<ComponentID, Pool>;
+        using ComponentPool = std::unordered_map<ComponentID, ComponentInfo>;
         ComponentPool pool_;
-    };  
+		std::unordered_map<Entity, ComponentContainter> entities_; // 存储实体对应的组件
+    }; 
+
+    class Commands final
+    {
+	public:
+
+    };
 }

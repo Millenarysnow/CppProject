@@ -11,6 +11,10 @@
 * std::enable_if<条件，类型> 若条件为真则返回类型（省略为void），为假则替换失败，而不返回任何类型
 * typename = 是一个匿名参数，仅用于类型检查
 */
+
+/**
+* 稀疏集合实现
+*/
 template<typename T, size_t PageSize, typename = std::enable_if<std::is_integral_v<T>>>
 class SparseSets final
 {

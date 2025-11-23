@@ -116,6 +116,16 @@ namespace ecs {
     class Commands final
     {
 	public:
+        Commands(World& world): world_(world) { }
+
+        /**
+		* 创建实体并添加一系列组件
+         */
+        template<typename... ComponentTypes>
+        Commands& spawn(ComponentTypes&&... components);
+
+	private:
+        World& world_;
 
     };
 }

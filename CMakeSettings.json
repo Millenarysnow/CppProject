@@ -24,18 +24,7 @@
       "inheritEnvironments": [ "linux_x64" ],
       "intelliSenseMode": "linux-gcc-x64",
       "wslPath": "${defaultWSLPath}",
-      "variables": [
-        {
-          "name": "CMAKE_C_COMPILER",
-          "value": "/usr/bin/x86_64-linux-gnu-gcc-13",
-          "type": "FILEPATH"
-        },
-        {
-          "name": "CMAKE_CXX_COMPILER",
-          "value": "/usr/bin/x86_64-linux-gnu-g++-13",
-          "type": "FILEPATH"
-        }
-      ]
+      "variables": []
     }
   ]
 }

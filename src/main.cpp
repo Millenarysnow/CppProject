@@ -8,10 +8,14 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-   std::cout << "$ ";
+  bool Start = true;
+  while(Start)
+  {
+    std::cout << "$ ";
 
-   string inputCommand;
-   getline(cin, inputCommand);
-
-   cout << inputCommand << ": " << "command not found" << endl;
+    string inputCommand;
+    getline(cin, inputCommand);
+    
+    cout << inputCommand << ": " << "command not found" << endl;
+  }
 }

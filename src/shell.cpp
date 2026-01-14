@@ -64,7 +64,7 @@ void MyShell::Shell::input()
     bool InDoubleQuote = false;
     for (int i = 0; i < Input.length(); i++)
     {
-        if(Input[i] == ' ')
+        if(Input[i] == ' ') // 空格
         {
             if(InSingleQuote || InDoubleQuote)
             {
@@ -86,32 +86,46 @@ void MyShell::Shell::input()
                 }
             }
         }
-        else if(Input[i] == '\'')
+        else if(Input[i] == '\'') // 单引号
         {
             if(InDoubleQuote == false)
                 InSingleQuote = !InSingleQuote;
             else
                 temp += Input[i];
         }
-        else if(Input[i] == '\"')
+        else if(Input[i] == '\"') // 双引号
         {
             if(InSingleQuote == false)
                 InDoubleQuote = !InDoubleQuote;
             else
                 temp += Input[i];
         }
-        else if(Input[i] == '\\')
+        else if(Input[i] == '\\') // 转义符
         {
-            if(InSingleQuote || InDoubleQuote)
+            if(InSingleQuote) // 单引号内完全不转义
                 temp += Input[i];
-            else
+            else if(InDoubleQuote)
+            {
+                i++;
+                if(i < Input.length())
+                {
+                    if(Input[i] == '\"' || Input[i] == '\\')
+                        temp += Input[i];
+                    else
+                    {
+                        temp += '\\';
+                        temp += Input[i];
+                    }
+                }
+            }
+            else // 不在引号内转义
             {
                 i++;
                 if(i < Input.length())
                     temp += Input[i];
             }
         }
-        else
+        else // 普通字符
         {
             temp += Input[i];
         }

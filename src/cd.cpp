@@ -14,38 +14,16 @@ MyShell::Cd::Cd(MyShell::Shell *shell) : Command(shell)
 void MyShell::Cd::Execute(std::vector<std::string> &Args)
 {
     int ret = 0;
-
+    
+    if(!Args[0].empty())
+    {
+        if(Args[0][0] == '~')
+        {
 #ifdef _WIN32
-    if(!Args[0].empty())
-    {
-        if(Args[0][0] == '~')
-        {
             char* home = getenv("USERPROFILE");
-            if(home != nullptr)
-            {
-                std::string new_path = std::string(home) + Args[0].substr(1);
-                ret = _chdir(new_path.c_str());
-            }
-            else
-            {
-                ret = -1;
-            }
-        }
-        else
-        {
-            ret = _chdir(Args[0].c_str());
-        }
-    }
-    else
-    {
-        ret = -1;
-    }
 #else
-    if(!Args[0].empty())
-    {
-        if(Args[0][0] == '~')
-        {
             char* home = getenv("HOME");
+#endif
             if(home != nullptr)
             {
                 std::string new_path = std::string(home) + Args[0].substr(1);
@@ -66,7 +44,6 @@ void MyShell::Cd::Execute(std::vector<std::string> &Args)
         ret = -1;
     }
 
-#endif
 
     if(ret == 0)
     { }

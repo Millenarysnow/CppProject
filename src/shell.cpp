@@ -8,7 +8,6 @@ constexpr char PATH_LIST_SEPARATOR = ':';
 
 #include <iostream>
 #include <sstream>
-
 #include <cstring>
 
 #include "exit.hpp"
@@ -57,14 +56,46 @@ void MyShell::Shell::input()
     Args.clear();
 
     std::getline(std::cin, Input);
-
-    stringstream ss;
-    ss.str(Input);
+    
+    Input += ' '; // 方便最后一个参数的处理
 
     string temp;
-    ss >> InputCommand;
-    while(ss >> temp)
-        Args.push_back(temp);
+    bool InSingleQuote = false;
+    for (int i = 0; i < Input.length(); i++)
+    {
+        if(Input[i] == ' ')
+        {
+            if(InSingleQuote)
+            {
+                temp += Input[i];
+            }
+            else // 处理拿到的完整参数
+            {
+                if(!temp.empty())
+                {
+                    if(InputCommand.empty())
+                    {
+                        InputCommand = temp;
+                    }
+                    else
+                    {
+                        Args.push_back(temp);
+                    }
+                    temp.clear();
+                }
+            }
+        }
+        else if(Input[i] == '\'')
+        {
+            InSingleQuote = !InSingleQuote;
+        }
+        else
+        {
+            temp += Input[i];
+        }
+    }
+
+    Input.pop_back(); // 去掉最后多余的空格
 }
 
 void MyShell::Shell::execute()

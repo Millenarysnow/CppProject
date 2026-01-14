@@ -18,7 +18,23 @@ void MyShell::Cd::Execute(std::vector<std::string> &Args)
 #ifdef _WIN32
     if(!Args[0].empty())
     {
-        ret = _chdir(Args[0].c_str());
+        if(Args[0][0] == '~')
+        {
+            char* home = getenv("USERPROFILE");
+            if(home != nullptr)
+            {
+                std::string new_path = std::string(home) + Args[0].substr(1);
+                ret = _chdir(new_path.c_str());
+            }
+            else
+            {
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = _chdir(Args[0].c_str());
+        }
     }
     else
     {
@@ -27,7 +43,23 @@ void MyShell::Cd::Execute(std::vector<std::string> &Args)
 #else
     if(!Args[0].empty())
     {
-        ret = chdir(Args[0].c_str());
+        if(Args[0][0] == '~')
+        {
+            char* home = getenv("HOME");
+            if(home != nullptr)
+            {
+                std::string new_path = std::string(home) + Args[0].substr(1);
+                ret = chdir(new_path.c_str());
+            }
+            else
+            {
+                ret = -1;
+            }
+        }
+        else
+        {
+            ret = chdir(Args[0].c_str());
+        }
     }
     else
     {

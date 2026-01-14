@@ -100,6 +100,17 @@ void MyShell::Shell::input()
             else
                 temp += Input[i];
         }
+        else if(Input[i] == '\\')
+        {
+            if(InSingleQuote || InDoubleQuote)
+                temp += Input[i];
+            else
+            {
+                i++;
+                if(i < Input.length())
+                    temp += Input[i];
+            }
+        }
         else
         {
             temp += Input[i];

@@ -13,6 +13,8 @@ constexpr char PATH_LIST_SEPARATOR = ':';
 #include <cstring>
 #include <algorithm>
 
+#include "linenoise.h"
+
 #include "exit.hpp"
 #include "echo.hpp"
 #include "type.hpp"
@@ -20,8 +22,11 @@ constexpr char PATH_LIST_SEPARATOR = ':';
 #include "cd.hpp"
 #include "utils.hpp"
 
+static MyShell::Shell* ShellInstance = nullptr;
+
 MyShell::Shell::Shell()
 {
+    ShellInstance = this;
     Exit* exit = new Exit(this);
     Echo* echo = new Echo(this);
     Type* type = new Type(this);
@@ -32,6 +37,10 @@ MyShell::Shell::Shell()
     Execute.insert({{"exit", exit}, {"echo", echo}, {"type", type}, {"pwd", pwd}, {"cd", cd}});
 
     get_path_dirs();
+
+    // ------ 配置 linenoise ------
+
+    linenoiseSetCompletionCallback(Completion);
 }
 
 MyShell::Shell::~Shell()
@@ -47,6 +56,21 @@ MyShell::Shell::~Shell()
     }
 }
 
+void MyShell::Shell::Completion(const char *buf, linenoiseCompletions *lc)
+{
+    if (!ShellInstance) return;
+    
+    string CurrentInput = string(buf);
+
+    for(const auto& cmd : ShellInstance->Commands)
+    {
+        if(cmd.find(CurrentInput) == 0)
+        {
+            linenoiseAddCompletion(lc, string(cmd + ' ').c_str());
+        }
+    }
+}
+
 bool MyShell::Shell::is_builtin(const string &cmd) const
 {
     return Commands.find(cmd) != Commands.end();
@@ -59,7 +83,19 @@ void MyShell::Shell::input()
     Args.clear();
     RedirectOperator = -1;
 
-    std::getline(std::cin, Input);
+    char* line = linenoise("$ ");
+
+    if(line == nullptr)
+    {
+        set_start(false);
+        return;
+    }
+
+    Input = string(line);
+
+    free(line);
+
+    // ------ 分词并解析 ------
 
     Input += ' '; // 方便最后一个参数处理
 
@@ -148,19 +184,29 @@ void MyShell::Shell::execute()
 {
     const int StdoutFd = dup(STDOUT_FILENO);
     const int StderrFd = dup(STDERR_FILENO);
+
+    // ------ 处理重定向 ------
     
-    if (RedirectOperator != -1) // 处理重定向
+    if (RedirectOperator != -1) 
     {
         if (RedirectOperator + 1 < Args.size())
         {
+            string CurrentOperator = Args[RedirectOperator];
+            string FileName = Args[RedirectOperator + 1];
+
+            // cout << "Test: Redirecting " << CurrentOperator << " to file: " << FileName << std::endl;
+
+            int tmp = MyShell::make_multilevel_dirs(FileName);
+
             int FileFd = -1;
-            if(Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>" || Args[RedirectOperator] == "2>>") // 追加
-                FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_APPEND, 0644);
+            if(CurrentOperator == ">>" || CurrentOperator == "1>>" || CurrentOperator == "2>>") // 追加
+                FileFd = open(FileName.c_str(), O_CREAT | O_WRONLY | O_APPEND, 0644);
             else // 覆盖
-                FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+                FileFd = open(FileName.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
 
             if (FileFd == -1)
             {
+                std::cout << tmp << std::endl;
                 std::cout << "Redirection file open error" << std::endl;
                 close(StdoutFd);
                 close(StderrFd);
@@ -169,9 +215,9 @@ void MyShell::Shell::execute()
 
             Args.erase(Args.begin() + RedirectOperator, Args.begin() + RedirectOperator + 2);
 
-            if(Args[RedirectOperator] == ">" || Args[RedirectOperator] == "1>" || Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>")
+            if(CurrentOperator == ">" || CurrentOperator == "1>" || CurrentOperator == ">>" || CurrentOperator == "1>>")
                 dup2(FileFd, STDOUT_FILENO);
-            else if(Args[RedirectOperator] == "2>" || Args[RedirectOperator] == "2>>")
+            else if(CurrentOperator == "2>" || CurrentOperator == "2>>")
                 dup2(FileFd, STDERR_FILENO);
             close(FileFd);
         }
@@ -195,7 +241,7 @@ void MyShell::Shell::execute()
         }
         else
         {
-            std::cout << Input << ": " << "command not found" << std::endl;
+            std::cerr << Input << ": " << "command not found" << std::endl;
         }
     }
 

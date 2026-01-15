@@ -7,6 +7,8 @@
 
 using namespace std;
 
+struct linenoiseCompletions;
+
 namespace MyShell{
 
     class Command;
@@ -16,6 +18,8 @@ namespace MyShell{
     public:
         Shell();
         ~Shell();
+
+        static void Completion(const char* buf, linenoiseCompletions* lc);
 
         bool get_start() const { return Start; }
         void set_start(bool val) { Start = val; }

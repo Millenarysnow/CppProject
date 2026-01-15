@@ -6,6 +6,7 @@
 #else
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h> 
 #endif
 
 #include "shell.hpp"
@@ -62,4 +63,38 @@ int MyShell::call_external_program(const std::string &ProgramPath, const std::ve
     }
 #endif
     return retn;
+}
+
+int MyShell::make_multilevel_dirs(const std::string &path)
+{
+    string current_path;
+    for (auto it = path.rbegin(); it != path.rend(); it++)
+    {
+        // TODO : 支持windows
+        if (*it != '/') continue;
+
+        current_path = path.substr(0, path.rend() - it - 1);
+        break;
+    }
+
+    if(current_path.empty()) return -1;
+
+    if(access(current_path.c_str(), F_OK) == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        if(mkdir(current_path.c_str(), 0755) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            make_multilevel_dirs(current_path);
+            return mkdir(current_path.c_str(), 0755);
+        }
+    }
+
+    return -1;
 }

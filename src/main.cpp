@@ -18,7 +18,7 @@ int main()
 
   while(shell.get_start())
   {
-    std::cout << "$ ";
+    //std::cout << "$ ";
 
     shell.input();
 

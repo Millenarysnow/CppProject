@@ -154,7 +154,7 @@ void MyShell::Shell::execute()
         if (RedirectOperator + 1 < Args.size())
         {
             int FileFd = -1;
-            if(Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>") // 追加
+            if(Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>" || Args[RedirectOperator] == "2>>") // 追加
                 FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_APPEND, 0644);
             else // 覆盖
                 FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -171,7 +171,7 @@ void MyShell::Shell::execute()
 
             if(Args[RedirectOperator] == ">" || Args[RedirectOperator] == "1>" || Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>")
                 dup2(FileFd, STDOUT_FILENO);
-            else if(Args[RedirectOperator] == "2>")
+            else if(Args[RedirectOperator] == "2>" || Args[RedirectOperator] == "2>>")
                 dup2(FileFd, STDERR_FILENO);
             close(FileFd);
         }

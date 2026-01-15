@@ -153,7 +153,12 @@ void MyShell::Shell::execute()
     {
         if (RedirectOperator + 1 < Args.size())
         {
-            const int FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+            int FileFd = -1;
+            if(Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>") // 追加
+                FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_APPEND, 0644);
+            else // 覆盖
+                FileFd = open(Args[RedirectOperator + 1].c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
             if (FileFd == -1)
             {
                 std::cout << "Redirection file open error" << std::endl;
@@ -164,7 +169,7 @@ void MyShell::Shell::execute()
 
             Args.erase(Args.begin() + RedirectOperator, Args.begin() + RedirectOperator + 2);
 
-            if(Args[RedirectOperator] == ">" || Args[RedirectOperator] == "1>")
+            if(Args[RedirectOperator] == ">" || Args[RedirectOperator] == "1>" || Args[RedirectOperator] == ">>" || Args[RedirectOperator] == "1>>")
                 dup2(FileFd, STDOUT_FILENO);
             else if(Args[RedirectOperator] == "2>")
                 dup2(FileFd, STDERR_FILENO);

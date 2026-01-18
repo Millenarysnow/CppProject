@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h> 
+#include <dirent.h>
 #endif
 
 #include "shell.hpp"
@@ -97,4 +98,36 @@ int MyShell::make_multilevel_dirs(const std::string &path)
     }
 
     return -1;
+}
+
+std::set<std::string> MyShell::get_executable_files(std::vector<std::string>& PathDir)
+{
+    std::set<std::string> executables;
+
+    // ------- 获取目录下所有可执行文件名 -------
+
+#ifdef _WIN32
+    // ...
+#else
+    for (const auto& dir : PathDir)
+    {
+        DIR* dp = opendir(dir.c_str());
+        if (dp == nullptr) continue;
+
+        struct dirent* entry;
+        while ((entry = readdir(dp)) != nullptr)
+        {
+            std::string file_path = dir + "/" + entry->d_name;
+
+            if (access(file_path.c_str(), X_OK) == 0)
+            {
+                executables.insert(std::string(entry->d_name));
+            }
+        }
+
+        closedir(dp);
+    }
+#endif
+
+    return executables;
 }

@@ -23,7 +23,7 @@ namespace MyShell{
         void set_start(bool val) { Start = val; }
 
         const vector<string>& get_dirs_vector() const { return PathDir; }
-        const set<string>& get_commands() const { return Commands; }
+        const set<string>& get_commands() const { return BuiltinCommands; }
         char** get_cargs() const { return CArgs; }
 
         bool is_builtin(const string& cmd) const;
@@ -39,8 +39,10 @@ namespace MyShell{
         string InputCommand;
         vector<string> Args;
 
-        set<string> Commands;
+        set<string> BuiltinCommands;
         unordered_map<string, Command*> Execute;
+
+        set<string> AllCommands;
 
         std::vector<std::string> PathDir;
 

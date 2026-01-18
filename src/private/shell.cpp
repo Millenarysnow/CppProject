@@ -34,12 +34,15 @@ MyShell::Shell::Shell()
     Pwd* pwd = new Pwd(this);
     Cd* cd = new Cd(this);
 
-    Commands.insert({"exit", "echo", "type", "pwd", "cd"});
+    BuiltinCommands.insert({"exit", "echo", "type", "pwd", "cd"});
     Execute.insert({{"exit", exit}, {"echo", echo}, {"type", type}, {"pwd", pwd}, {"cd", cd}});
 
     get_path_dirs();
 
     MyShell::cross_platform_register_linecompletion(this);
+
+    AllCommands = MyShell::get_executable_files(PathDir);
+    AllCommands.insert(BuiltinCommands.begin(), BuiltinCommands.end());
 }
 
 MyShell::Shell::~Shell()
@@ -58,7 +61,7 @@ MyShell::Shell::~Shell()
 vector<string> MyShell::Shell::match_comands(const string &text)
 {
     vector<string> Matches;
-    for (const auto& cmd : Commands) 
+    for (const auto& cmd : AllCommands) 
     {
         if (cmd.find(text) == 0) 
         {
@@ -70,7 +73,7 @@ vector<string> MyShell::Shell::match_comands(const string &text)
 
 bool MyShell::Shell::is_builtin(const string &cmd) const
 {
-    return Commands.find(cmd) != Commands.end();
+    return BuiltinCommands.find(cmd) != BuiltinCommands.end();
 }
 
 void MyShell::Shell::input()
@@ -229,7 +232,7 @@ void MyShell::Shell::execute()
 
     // --------- 执行命令 ---------
 
-    if (Commands.find(InputCommand) != Commands.end()) // 内置命令
+    if (BuiltinCommands.find(InputCommand) != BuiltinCommands.end()) // 内置命令
     {
         Command* cmd = Execute[InputCommand];
         if (cmd)
